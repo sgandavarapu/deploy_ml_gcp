@@ -5,19 +5,10 @@ import os
 import json
 import pandas as pd
 import numpy as np
-from bs4 import BeautifulSoup
-#from urlparse import urlparse
-#import schedule
 import datetime
-import newspaper
-import time
-import string
-import re
 from flask import Flask, jsonify, request, render_template
 from collections import Counter
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-#from vaderSentiment import SentimentIntensityAnalyzer
-from sklearn.model_selection import KFold
+f   rom sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -58,30 +49,6 @@ def predict():
     result['risk_score'] = risk_score*10000
 
     return render_template("result.html",result = result)
-
-
-@app.route('/mnca-classify-url',methods=['POST'])
-def classify_url():
-    """Function that takes the url string of a news article and returns the
-    classifciation """
-    if request.method == 'POST':
-
-        #url = request.form.query
-        url = request.form['query']
-        #url = request.form.get('url')
-
-        link = newspaper.Article(url)
-        link.download()
-        link.parse()
-
-        article = {}
-        article["title"] = link.title
-        article["text"] = link.text
-
-    #return jsonify(classify_article(article))
-    result = classify_article(article)
-    return render_template("result.html",result = result)
-
 
 if __name__ == '__main__':
   if app.config['DEBUG']:
