@@ -8,7 +8,7 @@ import numpy as np
 import datetime
 from flask import Flask, jsonify, request, render_template
 from collections import Counter
-f   rom sklearn.model_selection import KFold
+from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
