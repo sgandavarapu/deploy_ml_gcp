@@ -22,14 +22,13 @@ app = Flask(__name__)
 app.config['PORT'] = os.getenv("PORT", "8085")
 app.config['DEBUG'] = os.getenv("DEBUG", "true") == "true"
 
-@app.route('/score-transaction',methods=['GET','POST'])
+@app.route('/score-transaction',methods=['POST'])
 def predict():
     result = {}
-    
-    if request.method == 'POST':
-        data = request.form['transaction']
 
-        #read model pickel file from gcs
+    if request.method == 'POST':
+
+        data = request.get_json(force=True)#['payee_checks'])
 
         project_id = 'ingo-risk-ml'
         credentials = GoogleCredentials.get_application_default()
@@ -43,13 +42,12 @@ def predict():
         #load the model and predict
         risk_model = joblib.load('risk_model.pkl')
 
-        risk_score = risk_model.predict_proba([data['payee_checks'],data['maker_history']])
+        X = np.array([data['payee_checks'],data['maker_history']]).reshape(1,-1)
+        risk_score = risk_model.predict_proba(X)[0][0]*10000
 
+        data['risk_score'] = risk_score
 
-        result['trandetid'] = data['trandetid']
-        result['risk_score'] = risk_score*10000
-
-    return render_template("result.html",result = result)
+    return render_template("result.html",result = data)
 
 if __name__ == '__main__':
   if app.config['DEBUG']:
