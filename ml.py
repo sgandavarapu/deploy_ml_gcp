@@ -24,29 +24,30 @@ app.config['DEBUG'] = os.getenv("DEBUG", "true") == "true"
 
 @app.route('/score-transaction',methods=['GET','POST'])
 def predict():
-
-    #read model pickel file from gcs
-
-    project_id = 'ingo-risk-ml'
-    credentials = GoogleCredentials.get_application_default()
-
-    client = storage.Client(project=project_id)
-    bucket = client.get_bucket('ingo-risk-ml.appspot.com')
-
-    model_file = bucket.blob('risk_model.pkl')#.read_from()
-    model_file.download_to_filename('risk_model.pkl')
-
-    #load the model and predict
-    risk_model = joblib.load('risk_model.pkl')
-
+    result = {}
+    
     if request.method == 'POST':
         data = request.form['transaction']
 
-    risk_score = risk_model.predict_proba([data['payee_checks'],data['maker_history']])
+        #read model pickel file from gcs
 
-    result = {}
-    result['trandetid'] = data['trandetid']
-    result['risk_score'] = risk_score*10000
+        project_id = 'ingo-risk-ml'
+        credentials = GoogleCredentials.get_application_default()
+
+        client = storage.Client(project=project_id)
+        bucket = client.get_bucket('ingo-risk-ml.appspot.com')
+
+        model_file = bucket.blob('risk_model.pkl')#.read_from()
+        model_file.download_to_filename('risk_model.pkl')
+
+        #load the model and predict
+        risk_model = joblib.load('risk_model.pkl')
+
+        risk_score = risk_model.predict_proba([data['payee_checks'],data['maker_history']])
+
+
+        result['trandetid'] = data['trandetid']
+        result['risk_score'] = risk_score*10000
 
     return render_template("result.html",result = result)
 
