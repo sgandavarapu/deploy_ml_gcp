@@ -22,7 +22,7 @@ app = Flask(__name__)
 app.config['PORT'] = os.getenv("PORT", "8085")
 app.config['DEBUG'] = os.getenv("DEBUG", "true") == "true"
 
-@app.route('/score-transaction',methods=['POST'])
+@app.route('/score-transaction',methods=['GET','POST'])
 def predict():
 
     #read model pickel file from gcs
